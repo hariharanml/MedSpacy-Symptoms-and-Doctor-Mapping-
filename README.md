@@ -1,211 +1,149 @@
-Medical NER & Specialist Recommendation System
-A clinical NLP pipeline using medspaCy to extract medical problems from clinical text and recommend appropriate specialists based on detected conditions.
+Clinical Named Entity Recognition using medSpaCy
 
-🏥 Overview
-This system processes clinical narratives (discharge summaries, patient notes, symptoms) to:
+This project implements Clinical Named Entity Recognition (NER) using medSpaCy on de-identified hospital discharge summaries. The system processes raw clinical text and extracts structured medical entities such as:
 
-Identify medical problems using rule-based named entity recognition
+Diseases
 
-Filter out negated/uncertain findings using ConText algorithm
+Symptoms
 
-Map detected problems to appropriate medical specialties
+Medications
 
-Recommend specific specialists from a curated directory
+Procedures
 
-Built with medspaCy - a clinical NLP library extending spaCy for healthcare text processing.
+Diagnoses
 
-✨ Features
-Rule-based NER: TargetMatcher with 100+ clinical problem patterns
+It uses PyRuSH for clinical sentence segmentation and spaCy-based pipelines for entity extraction.
 
-Negation detection: ConText algorithm to identify negated/uncertain findings
+📌 Project Overview
 
-Synonym normalization: Maps variations to canonical terms
+Clinical notes are often unstructured and difficult to analyze. This project demonstrates how to:
 
-Intelligent specialty mapping: Pattern-based problem-to-specialty matching
+Perform sentence segmentation using PyRuSH
 
-Fallback extraction: Regex pattern matching for symptom extraction when NER fails
+Process discharge summaries
 
-Duplicate removal: Deduplicates detected problems
+Extract medical entities
 
-Comprehensive specialist directory: 20+ specialists across 18+ specialties
+Convert raw clinical text into structured outputs
 
-🛠️ Installation
-bash
-pip install medspacy
-pip install spacy
-python -m spacy download en_core_web_sm
-🚀 Quick Start
-python
-import medspacy
-from medspacy.ner import TargetRule
+Analyze patient-level medical information programmatically
 
-# Load medspaCy with clinical components
-nlp = medspacy.load(
-    medspacy_enable=["medspacy_pyrush", "medspacy_target_matcher", "medspacy_context"]
-)
+🛠️ Technologies Used
 
-# Define problem patterns
-problem_rules = [
-    TargetRule("stroke", "PROBLEM"),
-    TargetRule("diabetes", "PROBLEM"),
-    TargetRule("abdominal pain", "PROBLEM"),
-    # ... add more rules
-]
+Python
 
-# Add rules to pipeline
-target_matcher = nlp.get_pipe("medspacy_target_matcher")
-target_matcher.add(problem_rules)
+medSpaCy
 
-# Process clinical text
-text = "Patient presents with abdominal pain. No history of stroke."
-doc = nlp(text)
+spaCy
 
-# Extract active problems (skip negated)
-problems = []
-for ent in doc.ents:
-    if ent.label_ == "PROBLEM" and not ent._.is_negated:
-        problems.append(ent.text.lower())
+PyRuSH
 
-print(problems)  # ['abdominal pain']
-📋 Clinical Problem Coverage
-The system recognizes 100+ medical conditions across these categories:
+Jupyter Notebook
 
-Category	Examples
-🧠 Neurological	stroke, migraine, epilepsy, Parkinson's, dementia
-🩸 Endocrine	diabetes, thyroid disorders, PCOS, obesity
-🫀 Cardiovascular	hypertension, heart attack, arrhythmia, CAD
-🫁 Respiratory	asthma, COPD, pneumonia, tuberculosis
-🫂 Gastrointestinal	colon cancer, GERD, IBS, Crohn's, hepatitis
-🧬 Oncology	metastasis, leukemia, lymphoma, melanoma
-🦴 Musculoskeletal	arthritis, back pain, osteoporosis, gout
-🩻 Renal	kidney failure, UTIs, nephrolithiasis
-🩺 Other	depression, anxiety, anemia, allergies, etc.
-🩻 Specialty Mapping
-Problems are intelligently mapped to medical specialties:
+📂 Project Structure
+├── NER.ipynb              # Main notebook for running clinical NER
+├── README.md              # Project documentation
 
-python
-# Example mapping logic
-if "stroke" in problem_text or "cva" in problem_text:
-    return ["Neurologist"]
-elif "diabetes" in problem_text:
-    return ["Endocrinologist", "General Physician"]
-elif "cancer" in problem_text and "colon" in problem_text:
-    return ["Oncologist", "Gastroenterologist"]
-# ... and more
-👨‍⚕️ Specialist Directory
-Includes 20+ specialists across India:
+⚙️ Installation
+1️⃣ Clone the Repository
+git clone https://github.com/yourusername/your-repo-name.git
+cd your-repo-name
 
-Specialty	Sample Doctor	Location
-Neurologist	Dr. Alafiya Meditour	Gurugram, Haryana
-Cardiologist	Dr. Priya Mehta	Mumbai, Maharashtra
-Oncologist	Dr. Amit Choraria	Kolkata, West Bengal
-Pulmonologist	Dr. Sameer Bansal	Jaipur, Rajasthan
-... and 15+ more	...	...
-📊 Example Output
-Input:
+2️⃣ Create Virtual Environment (Recommended)
+python -m venv venv
+source venv/bin/activate   # Mac/Linux
+venv\Scripts\activate      # Windows
 
-text
-Patient presents with abdominal pain and history of type 2 diabetes. 
-Imaging shows no metastasis.
-Output:
+3️⃣ Install Dependencies
+pip install medspacy spacy
+pip install PyRuSH
 
-text
-🔍 Detected 2 problem(s): Abdominal Pain, Type 2 Diabetes
+🚀 How to Run
 
-👨‍⚕️ Recommended specialists:
+Open the notebook:
 
-🩺 Specialty: Gastroenterologist
-📛 Doctor: Dr. Bhartia Mithun
-📞 Contact: +91-9012345678
-📍 Location: Kamrup Metropolitan, Assam
-🎯 Specialization: Digestive Disorders, Endoscopy
+jupyter notebook
 
-🩺 Specialty: Endocrinologist
-📛 Doctor: Dr. Anshul Kumar
-📞 Contact: +91-9123456780
-📍 Location: West Delhi, Delhi
-🎯 Specialization: Diabetes, Thyroid Disorders, Hormonal Issues
-🔧 Key Components
-1. TargetMatcher
-Rule-based entity recognizer that matches literal strings or token patterns.
 
-python
-TargetRule("atrial fibrillation", "PROBLEM", 
-          pattern=[{"LOWER": "afib"}])  # Matches "afib" as synonym
-2. ConText Component
-Detects negation, uncertainty, and temporal status of clinical entities.
+Run NER.ipynb
 
-python
-if ent._.is_negated:
-    continue  # Skip "no evidence of metastasis"
-3. PyRuSH Sentencizer
-Clinical sentence splitter optimized for medical narratives.
+Provide clinical text input (example: discharge summary)
+
+The system will output:
+
+Sentence segmentation logs
+
+Extracted named entities
+
+Structured medical concepts
+
+📊 Example Input
+Chief Complaint:
+Abdominal pain
+
+History of Present Illness:
+74y female with type 2 dm and recent stroke...
+
+📈 Example Output
+
+Extracted Entities:
+
+Hydrochlorothiazide
+Abdominal pain
+Stroke
+Colon cancer
+Hemicolectomy
+Pancreatitis
+HTN
+
+🧠 How It Works
+
+Sentence Segmentation
+
+PyRuSH detects clinical sentence boundaries.
+
+Tokenization
+
+spaCy tokenizes the text.
+
+Entity Recognition
+
+medSpaCy extracts clinical entities.
+
+Structured Output
+
+Entities are returned as structured tuples.
 
 🎯 Use Cases
-Clinical Decision Support: Suggest appropriate specialist referrals
 
-Patient Triage: Automatically route patients based on symptoms
+Clinical decision support systems
 
-Medical Record Analysis: Extract active problems from discharge summaries
+Medical research analysis
 
-Telemedicine: Match patient-reported symptoms to specialists
+Hospital record structuring
 
-📁 Project Structure
-text
-├── NER.ipynb              # Main notebook with complete pipeline
-├── README.md              # This file
-└── discharge_summary.txt  # Sample clinical text (optional)
-⚙️ Configuration
-Modify the specialist directory to add/update doctors:
+Healthcare NLP research
 
-python
-specialist_directory["Neurologist"] = {
-    "name": "Dr. Name",
-    "contact": "+91-XXXXXXXXXX",
-    "location": "City, State",
-    "specialization": "Neurology, Stroke"
-}
-📈 Future Enhancements
-Add UMLS integration for broader concept coverage
+EHR data mining
 
-Implement machine learning-based NER as fallback
+🔐 Data Privacy
 
-Add temporal detection (acute vs. chronic)
+This project uses de-identified medical text.
+All patient-identifying information is masked.
 
-Create web API endpoint
+📌 Future Improvements
 
-Add confidence scores for recommendations
+Add entity classification labels
 
-Expand to multilingual support
+Convert output to structured JSON
 
-🤝 Contributing
-Contributions welcome! Areas for improvement:
+Integrate with FHIR format
 
-Add more medical problem patterns
+Build a Streamlit UI
 
-Expand specialist directory
+Deploy as an API
 
-Improve specialty mapping logic
+👨‍💻 Author
 
-Add unit tests
-
-Optimize performance for large documents
-
-📚 Dependencies
-Python 3.7+
-
-medspaCy ≥ 1.0.0
-
-spaCy ≥ 3.0.0
-
-en_core_web_sm
-
-📄 License
-MIT
-
-🙏 Acknowledgments
-medspaCy team for the clinical NLP library
-
-spaCy for the core NLP framework
-
-MIMIC-III dataset for clinical text examples
+Hari Haran.C
+AI/ML Enthusiast | Clinical NLP | LangChain | Healthcare AI
